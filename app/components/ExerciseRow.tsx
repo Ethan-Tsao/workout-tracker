@@ -27,7 +27,7 @@ type ExerciseRowProps = {
   setEditingExerciseId: (id: number | null) => void;
   deleteExercise: (exerciseId: number) => Promise<void>;
   addSet: (exerciseId: number) => Promise<void>;
-  updateSetField: (setId: number, field: keyof SetType, value: number) => Promise<void>;
+  updateSetField: (setId: number, field: keyof SetType, value: number | null) => Promise<void>;
   deleteSet: (setId: number) => Promise<void>;
 };
 
