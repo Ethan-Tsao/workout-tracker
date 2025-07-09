@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import SetRow from "./SetRow";
+import ConfirmationModal from "./ConfirmationModal";
 
 type SetType = {
   id: number;
@@ -44,95 +45,108 @@ export default function ExerciseRow({
   updateSetField,
   deleteSet,
 }: ExerciseRowProps) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
-    <div className="mb-6 border-b pb-4">
-      <div className="flex items-center gap-2 mb-1">
-        {editingExerciseId === exercise.id ? (
-          <>
-            <input
-              type="text"
-              value={exerciseNameDraft}
-              onChange={e => setExerciseNameDraft(e.target.value)}
-              className="border px-2 py-1 rounded"
-              onKeyDown={e => {
-                if (e.key === "Enter") saveExerciseName(exercise.id);
-                if (e.key === "Escape") {
+    <>
+      <div className="mb-6 border-b pb-4">
+        <div className="flex items-center gap-2 mb-1">
+          {editingExerciseId === exercise.id ? (
+            <>
+              <input
+                type="text"
+                value={exerciseNameDraft}
+                onChange={e => setExerciseNameDraft(e.target.value)}
+                className="border px-2 py-1 rounded"
+                onKeyDown={e => {
+                  if (e.key === "Enter") saveExerciseName(exercise.id);
+                  if (e.key === "Escape") {
+                    setEditingExerciseId(null);
+                    setExerciseNameDraft("");
+                  }
+                }}
+                autoFocus
+                disabled={!isEditable}
+              />
+              <button
+                onClick={() => saveExerciseName(exercise.id)}
+                className="text-green-600 font-bold"
+                title="Save"
+                disabled={!isEditable}
+              >
+                ✓
+              </button>
+              <button
+                onClick={() => {
                   setEditingExerciseId(null);
                   setExerciseNameDraft("");
-                }
-              }}
-              autoFocus
-              disabled={!isEditable}
-            />
-            <button
-              onClick={() => saveExerciseName(exercise.id)}
-              className="text-green-600 font-bold"
-              title="Save"
-              disabled={!isEditable}
-            >
-              ✓
-            </button>
-            <button
-              onClick={() => {
-                setEditingExerciseId(null);
-                setExerciseNameDraft("");
-              }}
-              className="text-gray-400"
-              title="Cancel"
-              disabled={!isEditable}
-            >
-              ✕
-            </button>
-          </>
-        ) : (
-          <>
-            <h3
-              className="font-bold cursor-pointer hover:underline"
-              onClick={() => isEditable && startEditExercise(exercise)}
-              title="Click to edit name"
-            >
-              {exercise.name}
-            </h3>
-            <button
-              onClick={() => isEditable && deleteExercise(exercise.id)}
-              className="text-red-500 ml-2"
-              title="Delete exercise"
-              disabled={!isEditable}
-            >
-              ✕
-            </button>
-          </>
-        )}
+                }}
+                className="text-gray-400"
+                title="Cancel"
+                disabled={!isEditable}
+              >
+                ✕
+              </button>
+            </>
+          ) : (
+            <>
+              <h3
+                className="font-bold cursor-pointer hover:underline"
+                onClick={() => isEditable && startEditExercise(exercise)}
+                title="Click to edit name"
+              >
+                {exercise.name}
+              </h3>
+              <button
+                onClick={() => isEditable && setConfirmOpen(true)}
+                className="text-red-500 ml-2"
+                title="Delete exercise"
+                disabled={!isEditable}
+              >
+                ✕
+              </button>
+            </>
+          )}
+        </div>
+        <table className="w-full text-sm mb-2">
+          <thead>
+            <tr>
+              <th className="border px-2 py-1">Set</th>
+              <th className="border px-2 py-1">Weight</th>
+              <th className="border px-2 py-1">Reps</th>
+              <th className="border px-2 py-1">RPE</th>
+              <th className="border px-2 py-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {exercise.sets.map(set => (
+              <SetRow
+                key={set.id}
+                set={set}
+                isEditable={isEditable}
+                updateSetField={updateSetField}
+                deleteSet={(id: number) => deleteSet(id)}
+              />
+            ))}
+          </tbody>
+        </table>
+        <button
+          onClick={() => isEditable && addSet(exercise.id)}
+          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mb-2"
+          disabled={!isEditable}
+        >
+          + Add Set
+        </button>
       </div>
-      <table className="w-full text-sm mb-2">
-        <thead>
-          <tr>
-            <th className="border px-2 py-1">Set</th>
-            <th className="border px-2 py-1">Weight</th>
-            <th className="border px-2 py-1">Reps</th>
-            <th className="border px-2 py-1">RPE</th>
-            <th className="border px-2 py-1"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {exercise.sets.map(set => (
-            <SetRow
-              key={set.id}
-              set={set}
-              isEditable={isEditable}
-              updateSetField={updateSetField}
-              deleteSet={(id: number) => deleteSet(id)}
-            />
-          ))}
-        </tbody>
-      </table>
-      <button
-        onClick={() => isEditable && addSet(exercise.id)}
-        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mb-2"
-        disabled={!isEditable}
-      >
-        + Add Set
-      </button>
-    </div>
+      <ConfirmationModal
+        open={confirmOpen}
+        message="Are you sure you want to delete this exercise (and all its sets)?"
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={async () => {
+          await deleteExercise(exercise.id);
+          setConfirmOpen(false);
+        }}
+      />
+    </>
   );
 }
