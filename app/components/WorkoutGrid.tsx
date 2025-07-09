@@ -26,7 +26,7 @@ type WorkoutGridProps = {
   isEditable: boolean;
   addExercise: (name: string) => Promise<void>;
   addSet: (exerciseId: number) => Promise<void>;
-  updateSetField: (setId: number, field: keyof SetType, value: number) => Promise<void>;
+  updateSetField: (setId: number, field: keyof SetType, value: number | null) => Promise<void>;
   deleteSet: (setId: number, exerciseId: number) => Promise<void>;
   deleteExercise: (exerciseId: number) => Promise<void>;
   editingExerciseId: number | null;
