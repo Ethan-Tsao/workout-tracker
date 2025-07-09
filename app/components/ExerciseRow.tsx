@@ -121,7 +121,7 @@ export default function ExerciseRow({
               set={set}
               isEditable={isEditable}
               updateSetField={updateSetField}
-              deleteSet={id => deleteSet(id)}
+              deleteSet={(id: number) => deleteSet(id)}
             />
           ))}
         </tbody>

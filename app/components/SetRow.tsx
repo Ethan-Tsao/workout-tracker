@@ -1,20 +1,33 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 
-export default function SetRow({ set, isEditable, updateSetField, deleteSet }) {
-  // Local state for editing
+type SetType = {
+  id: number;
+  setNumber: number;
+  weight: number;
+  reps: number;
+  rpe: number;
+};
+
+type SetRowProps = {
+  set: SetType;
+  isEditable: boolean;
+  updateSetField: (setId: number, field: keyof SetType, value: number) => Promise<void>;
+  deleteSet: (setId: number) => Promise<void>;
+};
+
+export default function SetRow({ set, isEditable, updateSetField, deleteSet }: SetRowProps) {
   const [weightInput, setWeightInput] = useState(set.weight.toString());
   const [repsInput, setRepsInput] = useState(set.reps.toString());
   const [rpeInput, setRpeInput] = useState(set.rpe.toString());
 
-  // When set changes (e.g., after save), update inputs
-  React.useEffect(() => {
+  useEffect(() => {
     setWeightInput(set.weight.toString());
     setRepsInput(set.reps.toString());
     setRpeInput(set.rpe.toString());
   }, [set.weight, set.reps, set.rpe]);
 
-  // Helper to commit changes
-  const commitField = (field, value) => {
+  const commitField = (field: keyof SetType, value: string) => {
     if (value === "" || isNaN(Number(value))) return;
     updateSetField(set.id, field, Number(value));
   };
@@ -29,9 +42,7 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }) {
           value={weightInput}
           min={0}
           disabled={!isEditable}
-          onChange={e => {
-            setWeightInput(e.target.value);
-          }}
+          onChange={e => setWeightInput(e.target.value)}
           onBlur={() => commitField("weight", weightInput)}
           onKeyDown={e => {
             if (e.key === "Enter") commitField("weight", weightInput);
