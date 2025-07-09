@@ -12,25 +12,31 @@ type SetType = {
 type SetRowProps = {
   set: SetType;
   isEditable: boolean;
-  updateSetField: (setId: number, field: keyof SetType, value: number) => Promise<void>;
+  updateSetField: (setId: number, field: keyof SetType, value: number | null) => Promise<void>;
   deleteSet: (setId: number) => Promise<void>;
 };
 
 export default function SetRow({ set, isEditable, updateSetField, deleteSet }: SetRowProps) {
-  const [weightInput, setWeightInput] = useState(set.weight.toString());
-  const [repsInput, setRepsInput] = useState(set.reps.toString());
-  const [rpeInput, setRpeInput] = useState(set.rpe.toString());
+  const [weightInput, setWeightInput] = useState(set.weight === null || set.weight === undefined ? "" : set.weight.toString());
+  const [repsInput, setRepsInput] = useState(set.reps === null || set.reps === undefined ? "" : set.reps.toString());
+  const [rpeInput, setRpeInput] = useState(set.rpe === null || set.rpe === undefined ? "" : set.rpe.toString());
 
   useEffect(() => {
-    setWeightInput(set.weight.toString());
-    setRepsInput(set.reps.toString());
-    setRpeInput(set.rpe.toString());
+    setWeightInput(set.weight === null || set.weight === undefined ? "" : set.weight.toString());
+    setRepsInput(set.reps === null || set.reps === undefined ? "" : set.reps.toString());
+    setRpeInput(set.rpe === null || set.rpe === undefined ? "" : set.rpe.toString());
   }, [set.weight, set.reps, set.rpe]);
 
+
   const commitField = (field: keyof SetType, value: string) => {
-    if (value === "" || isNaN(Number(value))) return;
+    // If the user leaves it blank, set to null
+    if (value === "" || isNaN(Number(value))) {
+      updateSetField(set.id, field, null);
+      return;
+    }
     updateSetField(set.id, field, Number(value));
   };
+
 
   return (
     <tr>

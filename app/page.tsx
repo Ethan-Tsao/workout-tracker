@@ -108,11 +108,16 @@ export default function Page() {
   const updateSetField = async (
     setId: number,
     field: keyof SetType,
-    value: number
+    value: number | null
   ) => {
     if (!workout) return;
-    if ((field === "weight" || field === "reps") && value < 0) return;
-    if (field === "rpe" && (value < 1 || value > 10)) return;
+
+    // Validation: only if value is not null
+    if (value !== null) {
+      if ((field === "weight" || field === "reps") && value < 0) return;
+      if (field === "rpe" && (value < 1 || value > 10)) return;
+    }
+
     setWorkout({
       ...workout,
       exercises: workout.exercises.map(ex => ({
@@ -122,12 +127,14 @@ export default function Page() {
         ),
       })),
     });
+
     await fetch(`/api/sets/${setId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [field]: value }),
     });
   };
+
 
   const deleteSet = async (setId: number, exerciseId: number) => {
     await fetch(`/api/sets/${setId}`, { method: "DELETE" });

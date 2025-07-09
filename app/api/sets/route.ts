@@ -13,10 +13,7 @@ export async function POST(req: NextRequest) {
   const newSet = await prisma.set.create({
     data: {
       exerciseId: data.exerciseId,
-      setNumber: data.setNumber ?? 1,
-      weight: 0,
-      reps: 0,
-      rpe: 0,
+      setNumber: data.setNumber ?? 1
     },
   });
 
