@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const setId = Number(params.id);
+export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+  const setId = Number(context.params.id);
   const data = await req.json();
 
   // Only update allowed fields
