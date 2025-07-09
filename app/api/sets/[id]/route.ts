@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
-  const setId = Number(context.params.id);
+export async function PATCH(req: NextRequest) {
+  // Get the set ID from the URL path
+  const urlParts = req.nextUrl.pathname.split("/");
+  const setIdStr = urlParts[urlParts.length - 1];
+  const setId = Number(setIdStr);
+
   const data = await req.json();
 
   // Only update allowed fields
@@ -19,6 +23,6 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
     });
     return NextResponse.json(updatedSet, { status: 200 });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: (err as any).message }, { status: 500 });
   }
 }
