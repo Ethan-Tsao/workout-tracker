@@ -52,13 +52,13 @@ export default function WorkoutHistoryToggle({
     <div>
       <div className="flex gap-4 mb-6">
         <button
-          className={`px-4 py-2 rounded ${viewMode === "calendar" ? "bg-blue-600 text-white" : "bg-gray-100"}`}
+          className={`px-4 py-2 rounded ${viewMode === "calendar" ? "bg-blue-600 text-white" : "bg-gray-100 text-black"}`}
           onClick={() => setViewMode('calendar')}
         >
           Calendar
         </button>
         <button
-          className={`px-4 py-2 rounded ${viewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-100"}`}
+          className={`px-4 py-2 rounded ${viewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-100 text-black"}`}
           onClick={() => setViewMode('list')}
         >
           List
@@ -82,9 +82,9 @@ export default function WorkoutHistoryToggle({
                   disabled={!workout}
                   title={workout ? formatDate(workout.date) : ""}
                 >
-                  <span>{i + 1}</span>
+                  <span className="font-semibold text-gray-900">{i + 1}</span>
                   {workout && (
-                    <span className="text-xs text-gray-600">{workout.exerciseCount} ex</span>
+                    <span className="text-xs text-gray-900">{workout.exerciseCount} ex</span>
                   )}
                 </button>
               );
@@ -99,11 +99,11 @@ export default function WorkoutHistoryToggle({
           {history.map(w => (
             <li
               key={w.id}
-              className={`p-2 border-b cursor-pointer hover:bg-blue-50 ${selectedWorkout === w.id ? "bg-blue-100" : ""}`}
+              className={`text-gray-900 p-2 border-b cursor-pointer hover:bg-blue-50 ${selectedWorkout === w.id ? "bg-blue-100" : ""}`}
               onClick={() => setSelectedWorkout(w.id)}
             >
               {formatDate(w.date)}{" "}
-              <span className="text-xs text-gray-500">({w.exerciseCount} exercises)</span>
+              <span className="text-xs text-gray-900">({w.exerciseCount} exercises)</span>
             </li>
           ))}
         </ul>
