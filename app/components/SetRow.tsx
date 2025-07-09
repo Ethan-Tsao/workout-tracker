@@ -1,22 +1,24 @@
-"use client";
-import React from "react";
+import React, { useState } from "react";
 
-type SetType = {
-  id: number;
-  setNumber: number;
-  weight: number;
-  reps: number;
-  rpe: number;
-};
+export default function SetRow({ set, isEditable, updateSetField, deleteSet }) {
+  // Local state for editing
+  const [weightInput, setWeightInput] = useState(set.weight.toString());
+  const [repsInput, setRepsInput] = useState(set.reps.toString());
+  const [rpeInput, setRpeInput] = useState(set.rpe.toString());
 
-type SetRowProps = {
-  set: SetType;
-  isEditable: boolean;
-  updateSetField: (setId: number, field: keyof SetType, value: number) => Promise<void>;
-  deleteSet: (setId: number) => Promise<void>;
-};
+  // When set changes (e.g., after save), update inputs
+  React.useEffect(() => {
+    setWeightInput(set.weight.toString());
+    setRepsInput(set.reps.toString());
+    setRpeInput(set.rpe.toString());
+  }, [set.weight, set.reps, set.rpe]);
 
-export default function SetRow({ set, isEditable, updateSetField, deleteSet }: SetRowProps) {
+  // Helper to commit changes
+  const commitField = (field, value) => {
+    if (value === "" || isNaN(Number(value))) return;
+    updateSetField(set.id, field, Number(value));
+  };
+
   return (
     <tr>
       <td className="border px-2 py-1 text-center">{set.setNumber}</td>
@@ -24,12 +26,15 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
         <input
           type="number"
           className="w-16 border rounded px-1"
-          value={set.weight}
+          value={weightInput}
           min={0}
           disabled={!isEditable}
           onChange={e => {
-            const val = parseFloat(e.target.value);
-            if (val >= 0) updateSetField(set.id, "weight", val);
+            setWeightInput(e.target.value);
+          }}
+          onBlur={() => commitField("weight", weightInput)}
+          onKeyDown={e => {
+            if (e.key === "Enter") commitField("weight", weightInput);
           }}
         />
       </td>
@@ -37,12 +42,13 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
         <input
           type="number"
           className="w-16 border rounded px-1"
-          value={set.reps}
+          value={repsInput}
           min={0}
           disabled={!isEditable}
-          onChange={e => {
-            const val = parseInt(e.target.value);
-            if (val >= 0) updateSetField(set.id, "reps", val);
+          onChange={e => setRepsInput(e.target.value)}
+          onBlur={() => commitField("reps", repsInput)}
+          onKeyDown={e => {
+            if (e.key === "Enter") commitField("reps", repsInput);
           }}
         />
       </td>
@@ -53,11 +59,12 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
           min={1}
           max={10}
           className="w-16 border rounded px-1"
-          value={set.rpe}
+          value={rpeInput}
           disabled={!isEditable}
-          onChange={e => {
-            const val = parseFloat(e.target.value);
-            if (val >= 1 && val <= 10) updateSetField(set.id, "rpe", val);
+          onChange={e => setRpeInput(e.target.value)}
+          onBlur={() => commitField("rpe", rpeInput)}
+          onKeyDown={e => {
+            if (e.key === "Enter") commitField("rpe", rpeInput);
           }}
         />
       </td>
