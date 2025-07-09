@@ -34,6 +34,7 @@ model Set {
   weight      Int
   reps        Int
   rpe         Float
-  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
+  exercise    Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   exerciseId  Int
 }
+

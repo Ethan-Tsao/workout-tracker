@@ -26,3 +26,16 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: (err as any).message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  const urlParts = new URL(req.url).pathname.split("/");
+  const setIdStr = urlParts[urlParts.length - 1];
+  const setId = Number(setIdStr);
+
+  try {
+    await prisma.set.delete({ where: { id: setId } });
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}

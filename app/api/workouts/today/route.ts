@@ -1,19 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Utility to get today's date as yyyy-mm-dd (midnight)
-function getTodayDateString() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now.toISOString();
-}
-
 export async function GET() {
-  // Find (or create) today's workout
+  // Today at midnight
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Try to find
+  // Try to find today's workout
   let workout = await prisma.workout.findFirst({
     where: { date: today },
     include: {
@@ -30,9 +23,7 @@ export async function GET() {
     workout = await prisma.workout.create({
       data: { date: today },
       include: {
-        exercises: {
-          include: { sets: true }
-        }
+        exercises: { include: { sets: true } }
       }
     });
   }
