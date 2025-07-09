@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+const TemplatesManager = dynamic(() => import("./components/TemplatesManager"), { ssr: false });
+
 
 // Import components
 const WorkoutHistoryToggle = dynamic(() => import("./components/WorkoutHistoryToggle"), { ssr: false });
@@ -186,6 +188,62 @@ export default function Page() {
   return (
     <main className="max-w-2xl mx-auto py-8 px-2">
       <h1 className="text-3xl font-bold mb-4">Workout Tracker</h1>
+
+      <TemplatesManager
+        onApply={async (exerciseNames: string[]) => {
+          if (!workout) return;
+
+          // For each exercise name in template
+          for (const name of exerciseNames) {
+            // If it's already present, skip
+            if (workout.exercises.some(ex => ex.name === name)) continue;
+
+            // 1. Add exercise to today’s workout
+            const res = await fetch("/api/exercises", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ workoutId: workout.id, name }),
+            });
+            const exercise = await res.json();
+
+            // 2. Fetch most recent sets for this exercise name
+            const setsRes = await fetch(`/api/exercises/latestSets?name=${encodeURIComponent(name)}`);
+            const latestSets = await setsRes.json();
+
+            // 3. Create sets (with most recent weight/reps/RPE), or 1 default set if no history
+            if (latestSets.length) {
+              for (const set of latestSets) {
+                await fetch("/api/sets", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    exerciseId: exercise.id,
+                    setNumber: set.setNumber,
+                    weight: set.weight,
+                    reps: set.reps,
+                    rpe: set.rpe,
+                  }),
+                });
+              }
+            } else {
+              // No history? Add 1 empty set
+              await fetch("/api/sets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  exerciseId: exercise.id,
+                  setNumber: 1,
+                }),
+              });
+            }
+          }
+          // --- After all adds, reload workout from API ---
+          const newWorkout = await fetch("/api/workouts/today").then(res => res.json());
+          setWorkout(newWorkout);
+        }}
+
+        currentWorkoutExercises={workout?.exercises.map(ex => ex.name) ?? []}
+      />
 
       <WorkoutHistoryToggle
         viewMode={viewMode}

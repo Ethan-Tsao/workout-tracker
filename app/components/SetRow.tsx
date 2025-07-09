@@ -41,6 +41,7 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
           className="w-16 border rounded px-1"
           value={weightInput}
           min={0}
+          placeholder="0"
           disabled={!isEditable}
           onChange={e => setWeightInput(e.target.value)}
           onBlur={() => commitField("weight", weightInput)}
@@ -55,6 +56,7 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
           className="w-16 border rounded px-1"
           value={repsInput}
           min={0}
+          placeholder="0"
           disabled={!isEditable}
           onChange={e => setRepsInput(e.target.value)}
           onBlur={() => commitField("reps", repsInput)}
@@ -69,6 +71,7 @@ export default function SetRow({ set, isEditable, updateSetField, deleteSet }: S
           step="0.5"
           min={1}
           max={10}
+          placeholder="1"
           className="w-16 border rounded px-1"
           value={rpeInput}
           disabled={!isEditable}
